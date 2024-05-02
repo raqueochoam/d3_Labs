@@ -40,12 +40,16 @@ d3.json("data/buildings.json").then((data)=> {
     g.append("g")
         .attr("class", "bottom axis")
 	    .attr("transform", "translate(0, " + height+ ")")
-        .call(bottomAxis);
+        .call(bottomAxis)
+        .selectAll("text")
+        .attr('text-anchor', 'end')
+        .attr('font-size', '10px')
+        .attr('transform', `rotate(-19) translate(-5, 10)`);
     // X Axis Label
     g.append("text")
         .attr("class", "x axis-label")
         .attr("x", width / 2)
-        .attr("y", height + 50) // Adjust position
+        .attr("y", height + 95)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
         .style("fill","black")
@@ -74,7 +78,7 @@ d3.json("data/buildings.json").then((data)=> {
         .append("rect")
         .attr("x", (d) => { return x(d.name); })
         .attr("y", (d) => { return y(d.height); })
-        .attr("width",  x.bandwidth())
+        .attr("width",  x.bandwidth)
         .attr("height", (d) => { return height - y(d.height); })
         .attr("fill", (d) => { return color(d.name); });
 
