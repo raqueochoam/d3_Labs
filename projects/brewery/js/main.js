@@ -82,9 +82,11 @@ function update(data) {
     var value = flag ? "revenue" : "profit";
     if(flag){
         yLabel.text("Revenue (dlls.)")
+        console.log("Revenue data")
     }
     else{
         yLabel.text("Profits (dlls.)")
+        console.log("Profits data")
     }
     
     console.log("updateando");
