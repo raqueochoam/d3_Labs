@@ -35,7 +35,7 @@ g.append("g")
     .attr('transform', `rotate(-19) translate(-5, 10)`);
 
 // X Axis Label
-g.append("text")
+var xLabel = g.append("text")
     .attr("class", "x axis-label")
     .attr("x", width / 2)
     .attr("y", height + 95)
@@ -69,7 +69,8 @@ d3.json("data/revenues.json").then((data)=> {
     });
     //console.log(data);
     d3.interval( ( ) => { 
-        update(data);
+        var newData = flag ? data : data.slice(1);
+        update(newData);
         flag = !flag;
     }, 1000);
     //update(data);
@@ -98,6 +99,14 @@ function update(data) {
 	// ... actualizar el eje x
     g.select(".bottom.axis")
         .call(bottomAxis);
+    
+    // Actualizar la posición de las barras existentes
+    g.selectAll("rect")
+        .transition() // Agregar transición para suavizar el cambio
+        .duration(650) // Duración de la transición en milisegundos
+        .attr("x", (d) => { return x(d.month); })
+        .attr("width", x.bandwidth());
+    
 	// ... actualizar el eje y
     g.select(".left.axis")
         .call(leftAxis);
@@ -110,8 +119,6 @@ function update(data) {
         .attr("width",  x.bandwidth)
         .attr("height", (d) => { return height - y(d[value]); })
         .attr("fill", "yellow");
-        
-        
     
     rectangles.exit().remove(); //Exit
 }
