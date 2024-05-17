@@ -92,33 +92,33 @@ function update(data) {
     
     console.log("updateando");
     //console.log(data);
-	// ... crear la escala para el eje x
+    // ... actualizar el dominio de la escala x
     x.domain(data.map((d) => { return d.month; }));
-	// ... crear la escala para el eje y
+    // ... actualizar el dominio de la escala y
     y.domain([0, d3.max(data, (d) => { return d[value]; })]);
-	// ... actualizar el eje x
+    // ... actualizar el eje x
     g.select(".bottom.axis")
         .call(bottomAxis);
     
-    // Actualizar la posición de las barras existentes
-    g.selectAll("rect")
-        .transition() // Agregar transición para suavizar el cambio
-        .duration(650) // Duración de la transición en milisegundos
-        .attr("x", (d) => { return x(d.month); })
-        .attr("width", x.bandwidth());
+    // Actualizar las barras existentes
+    var rectangles = g.selectAll("rect").data(data);
     
-	// ... actualizar el eje y
-    g.select(".left.axis")
-        .call(leftAxis);
-	// ... crear las barras
-    var rectangles = g.selectAll("rect").data(data); //Join
-
-    rectangles.enter().append("rect")//Enter
-        .attr("x", (d) => { return x(d.month); })//Update
+    rectangles.exit().remove(); // Eliminar las barras que ya no se necesitan
+    
+    // Actualizar la posición y tamaño de las barras existentes
+    rectangles.transition()
+        .duration(650)
+        .attr("x", (d) => { return x(d.month); })
+        .attr("y", (d) => { return y(d[value]); })
+        .attr("width", x.bandwidth())
+        .attr("height", (d) => { return height - y(d[value]); });
+    
+    // Añadir nuevas barras
+    rectangles.enter().append("rect")
+        .attr("x", (d) => { return x(d.month); })
         .attr("y", (d) => { return y(d[value]); })
         .attr("width",  x.bandwidth)
         .attr("height", (d) => { return height - y(d[value]); })
         .attr("fill", "yellow");
-    
-    rectangles.exit().remove(); //Exit
 }
+
