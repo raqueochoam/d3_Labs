@@ -73,9 +73,11 @@ var yearLabel = g.append("text")
     .attr("opacity", "0.5")
     .attr("text-anchor", "middle")
     .text("1800");
+//console.log("aqui si entro");
 
 // DATA
 d3.json("data/data.json").then(function (data) {
+    console.log("data loaded");
     const formattedData = data.map((year) => {
         return year["countries"].filter((country) => {
             var dataExists = (country.income && country.life_exp);
@@ -83,17 +85,44 @@ d3.json("data/data.json").then(function (data) {
         }).map((country) => {
             country.income = +country.income;
             country.life_exp = +country.life_exp;
+            country.population = +country.population;
             return country;
         });
     });
 
     // Initialize the visualization with the first year of data
-    update(formattedData[0], 1800);
+    console.log("formattedData", formattedData);
+    update(formattedData[0], 1000);
+    //console.log("esta jalando el main");
+}).catch(function (error) {
+    console.error("Error loading the data", error);
 });
 
 // Update function to update the visualization
 function update(data, year) {
-    // Here you can bind your data and create/update your visualization elements
+    console.log("esta jalando el update", data, year);
+    // DATA JOIN
+    var circles = g.selectAll("circle")
+        .data(data, (d) => d.country);
+    
+    // EXIT
+    circles.exit().remove();
+
+    // UPDATE CIRCLES
+    circles
+        .attr("cx", (d) => x(d.income))
+        .attr("cy", (d) => y(d.life_exp))
+        .attr("r", (d) => Math.sqrt(area(d.population) / Math.PI))
+        .attr("fill", (d) => color(d.continent));
+
+    // ENTER
+    circles.enter()
+        .append("circle")
+        .attr("cx", (d) => x(d.income))
+        .attr("cy", (d) => y(d.life_exp))
+        .attr("r", (d) => Math.sqrt(area(d.population) / Math.PI)*2)
+        .attr("fill", (d) => color(d.continent))
+        .attr("opacity", 0.75);
 
     // Update the year label
     yearLabel.text(year);
