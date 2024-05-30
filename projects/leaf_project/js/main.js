@@ -75,10 +75,12 @@ var yearLabel = g.append("text")
     .text("1800");
 //console.log("aqui si entro");
 
+var formattedData = [];
+
 // DATA
 d3.json("data/data.json").then(function (data) {
     console.log("data loaded");
-    const formattedData = data.map((year) => {
+    formattedData = data.map((year) => {
         return year["countries"].filter((country) => {
             var dataExists = (country.income && country.life_exp);
             return dataExists;
@@ -92,8 +94,14 @@ d3.json("data/data.json").then(function (data) {
 
     // Initialize the visualization with the first year of data
     console.log("formattedData", formattedData);
-    update(formattedData[0], 1000);
-    //console.log("esta jalando el main");
+    update(formattedData[0], 1800);
+
+    // Start the animation
+    var yearIndex = 0;
+    setInterval(() => {
+        yearIndex = (yearIndex < formattedData.length - 1) ? yearIndex + 1 : 0;
+        update(formattedData[yearIndex], 1800 + yearIndex);
+    }, 1000);
 }).catch(function (error) {
     console.error("Error loading the data", error);
 });
@@ -109,7 +117,7 @@ function update(data, year) {
     circles.exit().remove();
 
     // UPDATE CIRCLES
-    circles
+    circles.transition().duration(500)
         .attr("cx", (d) => x(d.income))
         .attr("cy", (d) => y(d.life_exp))
         .attr("r", (d) => Math.sqrt(area(d.population) / Math.PI))
@@ -120,9 +128,13 @@ function update(data, year) {
         .append("circle")
         .attr("cx", (d) => x(d.income))
         .attr("cy", (d) => y(d.life_exp))
-        .attr("r", (d) => Math.sqrt(area(d.population) / Math.PI)*2)
+        .attr("r", (d) => Math.sqrt(area(d.population) / Math.PI))
         .attr("fill", (d) => color(d.continent))
-        .attr("opacity", 0.75);
+        .attr("opacity", 0.75)
+        .transition().duration(500)
+        .attr("cx", (d) => x(d.income))
+        .attr("cy", (d) => y(d.life_exp))
+        .attr("r", (d) => Math.sqrt(area(d.population) / Math.PI));
 
     // Update the year label
     yearLabel.text(year);
